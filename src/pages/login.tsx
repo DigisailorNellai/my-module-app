@@ -12,7 +12,7 @@ export default function Login() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
+      router.push('/admin');
     } catch (error) {
       setError('Invalid email or password');
     }
