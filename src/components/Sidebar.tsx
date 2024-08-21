@@ -1,8 +1,10 @@
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { db, auth } from '../../firebase.config'; // Adjust the path as necessary
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+
 
 export default function Sidebar() {
   const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
