@@ -5,32 +5,32 @@ import { db, auth } from '../../../firebase.config'; // Correct import
 import { collection, doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
 import AddEmployeeForm from '@/components/adminBasedForm/AddEmployeeForm';
 import AddStudentForm from '@/components/adminBasedForm/AddStudentForm';
+import EmployeeList from '@/components/adminBasedForm/EmployeeList';
 
-type BusinessType = 'employeeManagement' | 'courseManagement';
+type businessType = 'company' | 'course';
 
 interface AdminData {
   businessId: string;
 }
 
 interface BusinessData {
-  businessType: BusinessType;
+  businessType: businessType;
 }
 
 const Adminpage: React.FC = () => {
-  const [businessType, setBusinessType] = useState<BusinessType | null>(null);
+  const [businessType, setBusinessType] = useState<businessType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEmployeeFormVisible, setEmployeeFormVisible] = useState(false); // State for form visibility
 
   useEffect(() => {
     const fetchBusinessType = async () => {
       const user = auth.currentUser;
       if (user) {
-        // Fetch the admin's businessId
-        const adminDocRef = doc(db, 'admins', user.uid); // Use doc to reference the document
+        const adminDocRef = doc(db, 'admins', user.uid); 
         const adminDoc = await getDoc(adminDocRef);
         const adminData = adminDoc.data() as AdminData;
 
         if (adminData && adminData.businessId) {
-          // Fetch the business type from the businesses collection
           const businessDocRef = doc(db, 'businesses', adminData.businessId);
           const businessDoc = await getDoc(businessDocRef);
           const businessData = businessDoc.data() as BusinessData;
@@ -46,6 +46,14 @@ const Adminpage: React.FC = () => {
     fetchBusinessType();
   }, []);
 
+  const toggleEmployeeForm = () => {
+    setEmployeeFormVisible(!isEmployeeFormVisible);
+  };
+
+  const closeEmployeeForm = () => {
+    setEmployeeFormVisible(false);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -57,31 +65,31 @@ const Adminpage: React.FC = () => {
   return (
     <SidebarLayout>
       <Header title={'Admin Panel'} />
-      <h1 className="text-2xl font-bold">Admin Page</h1>
-
-      {/* Conditional rendering based on business type */}
-      {businessType === 'employeeManagement' && (
-        <div>
+      {businessType === 'company' && (
+        <div className='ml-10'>
           <h2 className="text-xl font-semibold">Employee Management</h2>
-          <p>Here you can add and manage employees.</p>
-          <AddEmployeeForm />
+          <button 
+            className="py-2 px-4 bg-blue-500 text-white rounded-md mb-4" 
+            onClick={toggleEmployeeForm}
+          >
+            {isEmployeeFormVisible ? 'Cancel' : 'Add Employee'}
+          </button>
+          {isEmployeeFormVisible && <AddEmployeeForm closeForm={closeEmployeeForm} />}
+          <EmployeeList />
         </div>
       )}
-
-      {businessType === 'courseManagement' && (
+      {businessType === 'course' && (
         <div>
           <h2 className="text-xl font-semibold">Course Management</h2>
-          <p>Here you can add and manage courses and students.</p>
           <AddStudentForm />
         </div>
       )}
-
-      {/* Add more business types as needed */}
     </SidebarLayout>
   );
 };
 
 export default Adminpage;
+
 
 
 // import React from 'react';

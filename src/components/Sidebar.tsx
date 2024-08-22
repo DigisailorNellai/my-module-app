@@ -1,16 +1,14 @@
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { db, auth } from '../../firebase.config'; // Adjust the path as necessary
+import { db, auth } from '../../firebase.config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-
 
 export default function Sidebar() {
   const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [businessName, setBusinessName] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState<string>('Loading...');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,27 +20,25 @@ export default function Sidebar() {
       }
     });
 
-    return () => unsubscribe(); // Clean up subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (userId) {
         try {
-          // Fetch user document
-          const userDoc = await getDoc(doc(db, 'users', userId));
+          const userDoc = await getDoc(doc(db, 'admins', userId));
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setSidebarOptions(userData?.onboardingDetails?.selectedOptions || []);
             
-            // Fetch business document if businessId exists
             const businessId = userData?.businessId;
             if (businessId) {
               const businessDoc = await getDoc(doc(db, 'businesses', businessId));
               if (businessDoc.exists()) {
                 const businessData = businessDoc.data();
                 setBusinessName(businessData?.businessName || 'No Business Name');
-                setLogoUrl(businessData?.logoUrl || null); // Get the logo URL
+                setLogoUrl(businessData?.logoUrl || null);
               }
             }
           }
@@ -65,11 +61,9 @@ export default function Sidebar() {
     { id: 'users', name: 'Users', route: '/Users' },
   ];
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <div className="w-64 bg-gray-800 text-white h-screen p-4">
-      <div className=" ml-10 mb-4 flex items-center space-x-2">
+      <div className="ml-10 mb-4 flex items-center space-x-2">
         {logoUrl && (
           <img
             src={logoUrl}
@@ -93,6 +87,7 @@ export default function Sidebar() {
     </div>
   );
 }
+
 
 // import { useEffect, useState } from 'react';
 // import Link from 'next/link';
