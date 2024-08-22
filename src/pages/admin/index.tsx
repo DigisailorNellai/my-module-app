@@ -20,30 +20,51 @@ interface BusinessData {
 const Adminpage: React.FC = () => {
   const [businessType, setBusinessType] = useState<businessType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null); // State for error handling
   const [isEmployeeFormVisible, setEmployeeFormVisible] = useState(false); // State for form visibility
 
   useEffect(() => {
     const fetchBusinessType = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const adminDocRef = doc(db, 'admins', user.uid); 
-        const adminDoc = await getDoc(adminDocRef);
-        const adminData = adminDoc.data() as AdminData;
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const adminDocRef = doc(db, 'admins', user.uid); 
+          const adminDoc = await getDoc(adminDocRef);
+          const adminData = adminDoc.data() as AdminData;
 
-        if (adminData && adminData.businessId) {
-          const businessDocRef = doc(db, 'businesses', adminData.businessId);
-          const businessDoc = await getDoc(businessDocRef);
-          const businessData = businessDoc.data() as BusinessData;
+          if (adminData && adminData.businessId) {
+            const businessDocRef = doc(db, 'businesses', adminData.businessId);
+            const businessDoc = await getDoc(businessDocRef);
+            const businessData = businessDoc.data() as BusinessData;
 
-          if (businessData) {
-            setBusinessType(businessData.businessType);
+            if (businessData) {
+              setBusinessType(businessData.businessType);
+            } else {
+              setError('Business data not found.');
+            }
+          } else {
+            setError('Admin data not found.');
           }
+        } else {
+          setError('User not authenticated.');
         }
+      } catch (err) {
+        console.error('Error fetching business type:', err);
+        setError('Failed to load business data.');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    fetchBusinessType();
+    // Check if the user is authenticated first, then fetch business type
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchBusinessType();
+      } else {
+        setLoading(false);
+        setError('User not authenticated.');
+      }
+    });
   }, []);
 
   const toggleEmployeeForm = () => {
@@ -56,6 +77,10 @@ const Adminpage: React.FC = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   if (!businessType) {
@@ -89,21 +114,3 @@ const Adminpage: React.FC = () => {
 };
 
 export default Adminpage;
-
-
-
-// import React from 'react';
-// import SidebarLayout from '../../components/SidebarLayout';
-// import Header from '@/components/header';
-
-// const Adminpage: React.FC = () => {
-//   return (
-//     <SidebarLayout>
-//       <Header title={'Admin'}/>
-//       <h1 className="text-2xl font-bold">Admin Pagess</h1>
-//       {/* Page content here */}
-//     </SidebarLayout>
-//   );
-// };
-
-// export default Adminpage;
