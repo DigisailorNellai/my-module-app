@@ -39,6 +39,7 @@ export default function Login() {
             className="w-full mb-4 p-3 border rounded"
           />
           <div className="relative">
+
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
@@ -51,7 +52,7 @@ export default function Login() {
               onClick={togglePasswordVisibility}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
             >
-              {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+              {showPassword ? <FaEyeSlash className="text-gray-500 mb-3" /> : <FaEye className="text-gray-500 mb-3" />}
             </button>
           </div>
           <button onClick={login} className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700">
