@@ -4,6 +4,7 @@ import { auth } from '../../firebase.config'; // Import the initialized auth
 import { Menu, MenuItem, IconButton, Modal, Box, Button, Typography } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie'; // Import js-cookie
 
 interface HeaderProps {
   title: string;
@@ -21,7 +22,14 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     if (user) {
       setUserEmail(user.email);
     }
-  }, []);
+
+    // Optionally, check token in cookies as a fallback to update userEmail
+    const token = Cookies.get('token');
+    if (token && !userEmail) {
+      // Fetch and set user email based on token if needed
+      // For example, you could make a backend call to fetch user info using the token
+    }
+  }, [userEmail]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -43,6 +51,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      localStorage.removeItem('token'); // Clear token from local storage
+      Cookies.remove('token'); // Clear token from cookies
       router.push('/login'); // Redirect to the login page
     } catch (error) {
       console.error("Logout error:", error);
