@@ -34,15 +34,17 @@ export default function Registration() {
       // Create a new user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
-
+      console.log("User created with UID:", userId);
+  
       // Upload business logo if selected
       let logoDownloadUrl = '';
       if (logo) {
         const logoRef = ref(storage, `logos/${userId}_${logo.name}`);
         await uploadBytes(logoRef, logo);
         logoDownloadUrl = await getDownloadURL(logoRef);
+        console.log("Logo uploaded, URL:", logoDownloadUrl);
       }
-
+  
       // Create business document and get the ID
       const businessDocRef = await addDoc(collection(db, 'businesses'), {
         businessName,
@@ -51,7 +53,8 @@ export default function Registration() {
         logoUrl: logoDownloadUrl, // Save the logo URL
       });
       const businessId = businessDocRef.id;
-
+      console.log("Business document created with ID:", businessId);
+  
       // Save registration details and onboarding details in the user document
       await setDoc(doc(db, 'admins', userId), {
         registrationDetails: {
@@ -64,11 +67,12 @@ export default function Registration() {
         },
         businessId, // Reference to the business document
       });
-
+      console.log("Admin document created");
+  
       // Redirect to the onboarding page
       router.push('/onboarding');
     } catch (error) {
-      console.error("Error creating user:", error);
+      console.error("Error creating user or documents:", error);
     }
   };
 

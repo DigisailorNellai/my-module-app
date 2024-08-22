@@ -38,7 +38,7 @@ export default function Onboarding() {
       // Update the onboarding details in the existing document
       const user = auth.currentUser;
       if (user) {
-        await updateDoc(doc(db, 'users', user.uid), {
+        await updateDoc(doc(db, 'admins', user.uid), {
           onboardingDetails: {
             selectedOptions,
             authOptions,
