@@ -1,83 +1,14 @@
-// import React, { useState } from 'react';
-// import { db } from '../../../firebase.config'; // Adjust the import path as needed
-// import { collection, addDoc } from 'firebase/firestore';
-// import { auth } from '../../../firebase.config'; // Assuming you're using auth for the current user
-
-// const AddStudentForm: React.FC = () => {
-//   const [name, setName] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [course, setCourse] = useState('');
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     const user = auth.currentUser;
-
-//     if (user) {
-//       try {
-//         const studentData = { name, email, course };
-//         // Use the 'db' instance here instead of 'firestore'
-//         const docRef = await addDoc(collection(db, admins/${user.uid}/students), studentData);
-//         console.log('Document written with ID: ', docRef.id);
-//         // Clear form
-//         setName('');
-//         setEmail('');
-//         setCourse('');
-//       } catch (e) {
-//         console.error('Error adding document: ', e);
-//       }
-//     }
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit} className="space-y-4">
-//       <input
-//         type="text"
-//         placeholder="Name"
-//         value={name}
-//         onChange={(e) => setName(e.target.value)}
-//         className="input-field"
-//       />
-//       <input
-//         type="email"
-//         placeholder="Email"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//         className="input-field"
-//       />
-//       <input
-//         type="text"
-//         placeholder="Course"
-//         value={course}
-//         onChange={(e) => setCourse(e.target.value)}
-//         className="input-field"
-//       />
-//       <button type="submit" className="btn-primary">Add Student</button>
-//     </form>
-//   );
-// };
-
-// export default AddStudentForm;
-
-
-
-
-
-// src/components/AddStudentForm.tsx
-
-// src/components/AddStudentForm.tsx
-
-// src/components/AddStudentForm.tsx
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../../firebase.config'; 
 import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-interface AddStudentFormProps {
+interface AddCourseFormProps {
   closeForm: () => void;  // New prop to close the form
 }
 
-const AddEmployeeForm: React.FC<AddStudentFormProps> = ({ }) => {
+const AddCourseForm: React.FC<AddCourseFormProps> = ({ }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -113,9 +44,9 @@ const AddEmployeeForm: React.FC<AddStudentFormProps> = ({ }) => {
     if (user && businessId) {
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        const StudentRef = collection(db, `businesses/${businessId}/Student`);
-        const StudentData = { name, email, phone, address };
-        const docRef = await addDoc(StudentRef, StudentData);
+        const CourseRef = collection(db, `businesses/${businessId}/Course`);
+        const CourseData = { name, email, phone, address };
+        const docRef = await addDoc(CourseRef, CourseData);
         console.log('Employee added with ID: ', docRef.id);
 
         setName('');
@@ -137,7 +68,7 @@ const AddEmployeeForm: React.FC<AddStudentFormProps> = ({ }) => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Add Students</h2>
+      <h2 className="text-xl font-semibold mb-4">Add Course</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <input
@@ -189,11 +120,11 @@ const AddEmployeeForm: React.FC<AddStudentFormProps> = ({ }) => {
           type="submit"
           className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
         >
-          Add Employee
+          Add Course
         </button>
       </form>
     </div>
   );
 };
 
-export default AddEmployeeForm;
+export default AddCourseForm;

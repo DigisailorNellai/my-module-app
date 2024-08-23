@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import SidebarLayout from '../../components/SidebarLayout';
 import Header from '@/components/header';
-import { db, auth } from '../../../firebase.config'; // Correct import
-import { collection, doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import { db, auth } from '../../../firebase.config';
+import { collection, doc, getDoc } from 'firebase/firestore';
 import AddEmployeeForm from '@/components/adminBasedForm/AddEmployeeForm';
 import AddStudentForm from '@/components/adminBasedForm/AddStudentForm';
 import EmployeeList from '@/components/adminBasedForm/EmployeeList';
+import AddCourseForm from '@/components/adminBasedForm/Addcourse';
 
 type businessType = 'company' | 'course';
 
@@ -20,15 +21,17 @@ interface BusinessData {
 const Adminpage: React.FC = () => {
   const [businessType, setBusinessType] = useState<businessType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // State for error handling
-  const [isEmployeeFormVisible, setEmployeeFormVisible] = useState(false); // State for form visibility
+  const [error, setError] = useState<string | null>(null);
+  const [isEmployeeFormVisible, setEmployeeFormVisible] = useState(false);
+  const [isStudentFormVisible, setStudentFormVisible] = useState(false);
+  const [isCourseFormVisible, setCourseFormVisible] = useState(false);
 
   useEffect(() => {
     const fetchBusinessType = async () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const adminDocRef = doc(db, 'admins', user.uid); 
+          const adminDocRef = doc(db, 'admins', user.uid);
           const adminDoc = await getDoc(adminDocRef);
           const adminData = adminDoc.data() as AdminData;
 
@@ -56,7 +59,6 @@ const Adminpage: React.FC = () => {
       }
     };
 
-    // Check if the user is authenticated first, then fetch business type
     auth.onAuthStateChanged((user) => {
       if (user) {
         fetchBusinessType();
@@ -73,6 +75,14 @@ const Adminpage: React.FC = () => {
 
   const closeEmployeeForm = () => {
     setEmployeeFormVisible(false);
+  };
+
+  const toggleStudentForm = () => {
+    setStudentFormVisible(!isStudentFormVisible);
+  };
+
+  const toggleCourseForm = () => {
+    setCourseFormVisible(!isCourseFormVisible);
   };
 
   if (loading) {
@@ -104,9 +114,28 @@ const Adminpage: React.FC = () => {
         </div>
       )}
       {businessType === 'course' && (
-        <div>
+        <div className='ml-10'>
           <h2 className="text-xl font-semibold">Course Management</h2>
-          <AddStudentForm />
+          <div className='mt-10'>
+            <button 
+              className="py-2 px-4 bg-blue-500 text-white rounded-md mb-4 mr-10" 
+              onClick={toggleStudentForm}
+            >
+              {isStudentFormVisible ? 'Cancel' : 'Add Student'}
+            </button>
+            <button 
+              className="py-2 px-4 bg-green-500 text-white rounded-md mb-4" 
+              onClick={toggleCourseForm}
+            >
+              {isCourseFormVisible ? 'Cancel' : 'Add Course'}
+            </button>
+          </div>
+          {isStudentFormVisible && <AddStudentForm closeForm={function (): void {
+            throw new Error('Function not implemented.');
+          } } />}
+          {isCourseFormVisible && <AddCourseForm closeForm={function (): void {
+            throw new Error('Function not implemented.');
+          } } />}
         </div>
       )}
     </SidebarLayout>
