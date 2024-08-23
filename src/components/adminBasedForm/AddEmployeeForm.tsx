@@ -110,7 +110,7 @@ import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 interface AddEmployeeFormProps {
-  closeForm: () => void;  // New prop to close the form
+  closeForm: () => void;  // Prop to close the form
 }
 
 const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ closeForm }) => {
@@ -147,9 +147,19 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ closeForm }) => {
 
     if (user && businessId) {
       try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Create a new user in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const newUserId = userCredential.user.uid;
+        
+        // Store employee details in Firestore
         const employeesRef = collection(db, `businesses/${businessId}/employees`);
-        const employeeData = { name, email, phone, address };
+        const employeeData = {
+          name,
+          email,
+          phone,
+          address,
+          role: 'employee', // Add role information
+        };
         const docRef = await addDoc(employeesRef, employeeData);
         console.log('Employee added with ID: ', docRef.id);
 
