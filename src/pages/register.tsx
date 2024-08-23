@@ -65,7 +65,8 @@ export default function Registration() {
           selectedOptions: [],
           authOptions: [],
         },
-        businessId, // Reference to the business document
+        businessId, 
+        role: 'admin',// Reference to the business document
       });
       console.log("Admin document created");
   
